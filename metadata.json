@@ -1,0 +1,6 @@
+{
+  "name": "M-01 钛金属精密签字笔",
+  "description": "Ti-6Al-4V 航空五级钛合金 CNC 精密铣削机械签字笔 — 0.02mm 笔尖零虚位锁定，28.4g 黄金配重比，全金属双段棘轮结构。",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

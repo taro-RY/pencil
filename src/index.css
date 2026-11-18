@@ -1,0 +1,45 @@
+@import "tailwindcss";
+@custom-variant dark (&:where(.dark, .dark *));
+
+@layer base {
+  :root {
+    --studio-bg: #0E0F12;
+    --studio-surface: #14161B;
+    --studio-border: rgba(255, 255, 255, 0.08);
+    --ink-primary: #E6E4DF;
+    --ink-secondary: #9A9891;
+    --accent-brass: #C89B6E;
+    --paper-bg: #F6F4EF;
+    --paper-ink: #141413;
+  }
+
+  html {
+    background-color: var(--studio-bg);
+    color: var(--ink-primary);
+    font-family: "Plus Jakarta Sans", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+    scroll-behavior: smooth;
+  }
+
+  body {
+    overflow-x: clip;
+  }
+}
+
+.font-editorial {
+  font-family: "Cormorant Garamond", "Noto Serif SC", Georgia, serif;
+}
+
+.font-mono-tech {
+  font-family: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-variant-numeric: tabular-nums;
+}
+
+.tabular-nums {
+  font-variant-numeric: tabular-nums;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}
