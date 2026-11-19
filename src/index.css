@@ -3,12 +3,12 @@
 
 @layer base {
   :root {
-    --studio-bg: #0E0F12;
-    --studio-surface: #14161B;
-    --studio-border: rgba(255, 255, 255, 0.08);
-    --ink-primary: #E6E4DF;
-    --ink-secondary: #9A9891;
-    --accent-brass: #C89B6E;
+    --studio-bg: #DCEFEF;
+    --studio-surface: #FAF8F4;
+    --studio-border: rgba(20, 22, 25, 0.1);
+    --ink-primary: #141619;
+    --ink-secondary: #4C525C;
+    --accent-brass: #9C6226;
     --paper-bg: #F6F4EF;
     --paper-ink: #141413;
   }

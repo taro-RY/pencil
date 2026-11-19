@@ -431,10 +431,10 @@ export function drawBotanicalSprout(
   angle: number,
   seedVal: number,
 ) {
-  const roll = seededRoll(x * 0.37 + y * 0.53 + seedVal, 2);
-  const variant = seededRoll(seedVal * 1.13 + x, 5);
+  const roll = seededRoll(seedVal, 2);
+  const variant = seededRoll(seedVal, 5);
   const side = variant > 0.5 ? -1 : 1;
-  const radius = 6.8 + (seedVal % 4.6);
+  const radius = 6.8 + seededRoll(seedVal, 11) * 4.6;
 
   ctx.save();
   ctx.translate(x, y);
@@ -442,7 +442,7 @@ export function drawBotanicalSprout(
   let effectiveStyle: FlowerStyleId = style;
   if (style === 'meadow') {
     const pool: FlowerStyleId[] = ['blueAster', 'chrysanthemum', 'plum', 'lilyBell', 'wisteria'];
-    effectiveStyle = pool[Math.floor(seededRoll(x + y + seedVal, 9) * pool.length)];
+    effectiveStyle = pool[Math.floor(seededRoll(seedVal, 9) * pool.length)];
   }
 
   if (roll > 0.32) {

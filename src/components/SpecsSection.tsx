@@ -78,38 +78,38 @@ export const SpecsSection: React.FC = () => {
   return (
     <section
       id="specs"
-      className="relative z-10 scroll-mt-16 border-t border-white/[0.08] bg-transparent py-24 md:py-32"
+      className="relative z-10 scroll-mt-16 border-t border-[#141619]/10 bg-[#FAF8F4]/55 backdrop-blur-sm py-24 md:py-32"
       data-testid="specs-section"
     >
       <div className="mx-auto max-w-[1280px] px-6 md:px-10">
         {/* Editorial Heading */}
-        <div className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between border-b border-white/[0.08] pb-8">
+        <div className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between border-b border-[#141619]/10 pb-8">
           <div>
-            <p className="font-mono-tech text-xs tracking-widest text-[#E0B382]">
+            <p className="font-mono-tech text-xs tracking-widest text-[#9C6226]">
               03. 尺度 · 平衡之诗
             </p>
             <h2
-              className="mt-2 font-editorial text-3xl md:text-5xl font-medium tracking-tight text-[#F6F4EF]"
+              className="mt-2 font-editorial text-3xl md:text-5xl font-medium tracking-tight text-[#141619]"
               style={{ textWrap: 'balance' }}
             >
               像校正一枚机芯一样校正笔身配重。
             </h2>
           </div>
-          <p className="font-mono-tech text-xs text-[#B6B3AC] tabular-nums">
+          <p className="font-mono-tech text-xs text-[#4C525C] tabular-nums">
             全长 142.0 mm · 握径 Ø 9.8 mm · 12° 笔夹倒角
           </p>
         </div>
 
         {/* Interactive Kinetic Equilibrium & Cross-Section Blueprint */}
-        <div className="mt-12 border border-white/[0.1] bg-white/[0.025] p-6 md:p-10">
+        <div className="mt-12 border border-[#141619]/12 bg-[#FAF8F4]/84 backdrop-blur-md p-6 md:p-10">
           <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
             <div>
-              <span className="font-mono-tech text-xs tracking-wider text-[#F6F4EF]">
+              <span className="font-mono-tech text-xs font-medium tracking-wider text-[#141619]">
                 M-01 纵向剖面与力学支点交互图 (单位: MM)
               </span>
-              <p className="mt-1 text-xs text-[#9A9891]">{activeZone.note}</p>
+              <p className="mt-1 text-xs text-[#4C525C]">{activeZone.note}</p>
             </div>
-            <span className="font-mono-tech text-xs text-[#E0B382] tabular-nums">
+            <span className="font-mono-tech text-xs font-medium text-[#9C6226] tabular-nums">
               倾角 {activeZone.tiltDeg.toFixed(1)}° · 重心较虎口前移 4.0 mm
             </span>
           </div>
@@ -125,10 +125,10 @@ export const SpecsSection: React.FC = () => {
                   onClick={() => setActiveZoneId(zone.id)}
                   onMouseEnter={() => setActiveZoneId(zone.id)}
                   aria-pressed={active}
-                  className={`border px-3 py-1.5 text-xs transition-colors whitespace-nowrap shrink-0 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#C89B6E] ${
+                  className={`border px-3 py-1.5 text-xs transition-colors whitespace-nowrap shrink-0 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#9C6226] ${
                     active
-                      ? 'border-[#C89B6E] bg-[#C89B6E]/15 text-[#F6F4EF]'
-                      : 'border-white/12 bg-black/20 text-[#9A9891] hover:border-white/30 hover:text-[#E6E4DF]'
+                      ? 'border-[#9C6226] bg-[#9C6226]/12 text-[#141619] font-medium'
+                      : 'border-[#141619]/12 bg-white/75 text-[#4C525C] hover:border-[#141619]/35 hover:text-[#141619]'
                   }`}
                 >
                   <span className="font-medium mr-2">{zone.label}</span>
@@ -157,7 +157,7 @@ export const SpecsSection: React.FC = () => {
                   <path
                     d="M 25 0 L 0 0 0 25"
                     fill="none"
-                    stroke="rgba(255,255,255,0.045)"
+                    stroke="rgba(20,22,25,0.06)"
                     strokeWidth="1"
                   />
                 </pattern>
@@ -167,14 +167,14 @@ export const SpecsSection: React.FC = () => {
               {/* Stationary Fulcrum Triangle at 66.8mm (x=476) */}
               <polygon
                 points="476,162 466,184 486,184"
-                fill={activeZoneId === 'fulcrum' ? '#E0B382' : 'rgba(230,228,223,0.45)'}
+                fill={activeZoneId === 'fulcrum' ? '#9C6226' : 'rgba(20,22,25,0.42)'}
               />
               <line
                 x1="476"
                 y1="162"
                 x2="476"
                 y2="214"
-                stroke="rgba(230,228,223,0.45)"
+                stroke="rgba(20,22,25,0.42)"
                 strokeDasharray="3 3"
                 strokeWidth="1"
               />
@@ -193,7 +193,7 @@ export const SpecsSection: React.FC = () => {
                   y1="130"
                   x2="960"
                   y2="130"
-                  stroke="rgba(224,179,130,0.4)"
+                  stroke="rgba(156,98,38,0.45)"
                   strokeDasharray="6 4"
                   strokeWidth="1"
                 />
@@ -201,13 +201,13 @@ export const SpecsSection: React.FC = () => {
                 {/* 0.38mm Tungsten Tip */}
                 <polygon
                   points="95,130 128,125 128,135"
-                  fill={activeZoneId === 'tip' ? '#E0B382' : '#F6F4EF'}
+                  fill={activeZoneId === 'tip' ? '#9C6226' : '#141619'}
                 />
                 {/* Nose Cone */}
                 <polygon
                   points="128,125 245,104 245,156 128,135"
-                  fill={activeZoneId === 'tip' ? 'rgba(224,179,130,0.12)' : 'none'}
-                  stroke={activeZoneId === 'tip' ? '#E0B382' : '#E6E4DF'}
+                  fill={activeZoneId === 'tip' ? 'rgba(156,98,38,0.14)' : 'none'}
+                  stroke={activeZoneId === 'tip' ? '#9C6226' : '#1C2026'}
                   strokeWidth="1.4"
                 />
                 {/* Zero-Play Internal Collet */}
@@ -218,10 +218,10 @@ export const SpecsSection: React.FC = () => {
                   height="14"
                   fill={
                     activeZoneId === 'collet'
-                      ? 'rgba(224,179,130,0.48)'
-                      : 'rgba(200,155,110,0.22)'
+                      ? 'rgba(156,98,38,0.35)'
+                      : 'rgba(156,98,38,0.16)'
                   }
-                  stroke="#E0B382"
+                  stroke="#9C6226"
                   strokeWidth={activeZoneId === 'collet' ? '1.8' : '1'}
                 />
 
@@ -231,8 +231,8 @@ export const SpecsSection: React.FC = () => {
                   y="104"
                   width="600"
                   height="52"
-                  fill="rgba(255,255,255,0.03)"
-                  stroke="#E6E4DF"
+                  fill="rgba(20,22,25,0.03)"
+                  stroke="#1C2026"
                   strokeWidth="1.4"
                 />
 
@@ -246,7 +246,7 @@ export const SpecsSection: React.FC = () => {
                       y1="104"
                       x2={gx}
                       y2="156"
-                      stroke="rgba(230,228,223,0.28)"
+                      stroke="rgba(20,22,25,0.28)"
                       strokeWidth="1"
                     />
                   );
@@ -260,10 +260,10 @@ export const SpecsSection: React.FC = () => {
                   height="38"
                   fill={
                     activeZoneId === 'cg'
-                      ? 'rgba(224,179,130,0.34)'
-                      : 'rgba(200,155,110,0.18)'
+                      ? 'rgba(156,98,38,0.28)'
+                      : 'rgba(156,98,38,0.14)'
                   }
-                  stroke="#E0B382"
+                  stroke="#9C6226"
                   strokeWidth={activeZoneId === 'cg' ? '1.8' : '1.2'}
                 />
 
@@ -273,8 +273,8 @@ export const SpecsSection: React.FC = () => {
                   y="122"
                   width="540"
                   height="16"
-                  fill="rgba(230,228,223,0.12)"
-                  stroke="rgba(230,228,223,0.55)"
+                  fill="rgba(20,22,25,0.08)"
+                  stroke="rgba(20,22,25,0.52)"
                   strokeWidth="1"
                 />
 
@@ -284,16 +284,16 @@ export const SpecsSection: React.FC = () => {
                   y="115"
                   width="115"
                   height="30"
-                  fill="rgba(230,228,223,0.08)"
-                  stroke="#9A9891"
+                  fill="rgba(20,22,25,0.06)"
+                  stroke="#4C525C"
                   strokeWidth="1.1"
                 />
 
                 {/* Clip */}
                 <polygon
                   points="640,94 840,94 845,104 652,104"
-                  fill="rgba(230,228,223,0.16)"
-                  stroke="#E6E4DF"
+                  fill="rgba(20,22,25,0.12)"
+                  stroke="#1C2026"
                   strokeWidth="1.2"
                 />
 
@@ -303,8 +303,8 @@ export const SpecsSection: React.FC = () => {
                   y="110"
                   width="60"
                   height="40"
-                  fill="rgba(230,228,223,0.14)"
-                  stroke="#E6E4DF"
+                  fill="rgba(20,22,25,0.10)"
+                  stroke="#1C2026"
                   strokeWidth="1.4"
                 />
 
@@ -314,17 +314,17 @@ export const SpecsSection: React.FC = () => {
                   y1="52"
                   x2="453"
                   y2="206"
-                  stroke="#E0B382"
+                  stroke="#9C6226"
                   strokeWidth="1.6"
                 />
-                <circle cx="453" cy="130" r="6" fill="#131722" stroke="#E0B382" strokeWidth="2" />
-                <circle cx="453" cy="130" r="2.2" fill="#E0B382" />
+                <circle cx="453" cy="130" r="6" fill="#FAF8F4" stroke="#9C6226" strokeWidth="2" />
+                <circle cx="453" cy="130" r="2.2" fill="#9C6226" />
 
                 <text
                   x="453"
                   y="40"
                   textAnchor="middle"
-                  fill="#E0B382"
+                  fill="#9C6226"
                   fontSize="12"
                   fontFamily="IBM Plex Mono, monospace"
                 >
@@ -335,7 +335,7 @@ export const SpecsSection: React.FC = () => {
                   x="154"
                   y="84"
                   textAnchor="middle"
-                  fill="#F6F4EF"
+                  fill="#141619"
                   fontSize="11"
                   fontFamily="IBM Plex Mono, monospace"
                 >
@@ -346,7 +346,7 @@ export const SpecsSection: React.FC = () => {
                   y1="90"
                   x2="154"
                   y2="120"
-                  stroke="rgba(230,228,223,0.4)"
+                  stroke="rgba(20,22,25,0.38)"
                   strokeWidth="1"
                 />
               </g>
@@ -355,7 +355,7 @@ export const SpecsSection: React.FC = () => {
                 x="482"
                 y="228"
                 textAnchor="middle"
-                fill="#B6B3AC"
+                fill="#4C525C"
                 fontSize="11"
                 fontFamily="IBM Plex Mono, monospace"
               >
@@ -363,15 +363,15 @@ export const SpecsSection: React.FC = () => {
               </text>
 
               {/* Overall 142.0 mm dimension bar */}
-              <line x1="95" y1="248" x2="905" y2="248" stroke="rgba(255,255,255,0.22)" strokeWidth="1" />
-              <line x1="95" y1="242" x2="95" y2="254" stroke="rgba(255,255,255,0.35)" strokeWidth="1" />
-              <line x1="905" y1="242" x2="905" y2="254" stroke="rgba(255,255,255,0.35)" strokeWidth="1" />
-              <rect x="438" y="238" width="124" height="20" fill="#161A24" />
+              <line x1="95" y1="248" x2="905" y2="248" stroke="rgba(20,22,25,0.22)" strokeWidth="1" />
+              <line x1="95" y1="242" x2="95" y2="254" stroke="rgba(20,22,25,0.35)" strokeWidth="1" />
+              <line x1="905" y1="242" x2="905" y2="254" stroke="rgba(20,22,25,0.35)" strokeWidth="1" />
+              <rect x="438" y="238" width="124" height="20" fill="#F5F2EB" />
               <text
                 x="500"
                 y="252"
                 textAnchor="middle"
-                fill="#F6F4EF"
+                fill="#141619"
                 fontSize="11"
                 fontFamily="IBM Plex Mono, monospace"
               >
@@ -382,23 +382,23 @@ export const SpecsSection: React.FC = () => {
         </div>
 
         {/* Borderless Museum-Placard Precision Metrics */}
-        <div className="mt-12 grid grid-cols-1 gap-8 border-t border-white/[0.08] pt-10 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="mt-12 grid grid-cols-1 gap-8 border-t border-[#141619]/10 pt-10 sm:grid-cols-2 lg:grid-cols-4">
           {CORE_SPECS.map((item) => (
             <div key={item.code} className="flex flex-col justify-between">
               <div>
-                <p className="font-mono-tech text-[11px] tracking-widest text-[#B6B3AC]">
+                <p className="font-mono-tech text-[11px] tracking-widest text-[#4C525C]">
                   {item.label}
                 </p>
                 <div className="mt-3 flex items-baseline gap-2">
-                  <span className="font-editorial text-4xl md:text-5xl font-medium tracking-tight text-[#F6F4EF] tabular-nums">
+                  <span className="font-editorial text-4xl md:text-5xl font-medium tracking-tight text-[#141619] tabular-nums">
                     {item.value}
                   </span>
-                  <span className="font-mono-tech text-sm text-[#E0B382]">
+                  <span className="font-mono-tech text-sm font-medium text-[#9C6226]">
                     {item.unit}
                   </span>
                 </div>
               </div>
-              <p className="mt-4 text-xs leading-relaxed text-[#9A9891]">
+              <p className="mt-4 text-xs leading-relaxed text-[#4C525C]">
                 {item.detail}
               </p>
             </div>

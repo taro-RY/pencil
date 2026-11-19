@@ -2,10 +2,12 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {
   EXPLODED_PARTS,
+  HERO_PEN_SCALE,
   MATERIAL_LIST,
   MAX_ENGRAVING_LENGTH,
   buildOrderSummary,
   computeExplodedOffsets,
+  computeHeroPenScale,
   computeInkWidth,
   validateEngraving,
 } from './penConfig';
@@ -75,4 +77,14 @@ test('buildOrderSummary produces deterministic confirmation with complimentary e
   assert.equal(order.hasEngraving, true);
   assert.equal(order.engraving, 'M01-ALEX');
   assert.match(order.orderNumber, /^M01-261117-\d{4}$/);
+});
+
+test('computeHeroPenScale reduces hero pen by 1/3 and restores full size when exploded', () => {
+  assert.ok(Math.abs(HERO_PEN_SCALE - 2 / 3) < 1e-6);
+  assert.ok(Math.abs(computeHeroPenScale(0) - 2 / 3) < 1e-6);
+  assert.ok(Math.abs(computeHeroPenScale(-0.5) - 2 / 3) < 1e-6);
+  assert.equal(computeHeroPenScale(1), 1);
+  assert.equal(computeHeroPenScale(1.5), 1);
+  const mid = computeHeroPenScale(0.5);
+  assert.ok(mid > 2 / 3 && mid < 1);
 });

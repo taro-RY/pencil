@@ -463,7 +463,7 @@ export const FeelLabSection: React.FC<FeelLabSectionProps> = ({
     <section
       id="feel"
       ref={sectionRef}
-      className="relative z-10 scroll-mt-16 border-t border-white/[0.08] bg-transparent py-24 md:py-32"
+      className="relative z-10 scroll-mt-16 border-t border-[#141619]/10 bg-[#FAF8F4]/55 backdrop-blur-sm py-24 md:py-32"
       data-testid="feel-lab-section"
       data-tip-extended={tipExtended ? 'true' : 'false'}
       data-material={materialId}
@@ -472,13 +472,13 @@ export const FeelLabSection: React.FC<FeelLabSectionProps> = ({
     >
       <div className="mx-auto max-w-[1280px] px-6 md:px-10">
         {/* Open Exhibition Header */}
-        <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between border-b border-white/[0.08] pb-8">
+        <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between border-b border-[#141619]/10 pb-8">
           <div>
-            <p className="font-mono-tech text-xs tracking-widest text-[#E0B382]">
+            <p className="font-mono-tech text-xs tracking-widest text-[#9C6226]">
               02. 听风 · 素纸生春
             </p>
             <h2
-              className="mt-2 font-editorial text-3xl md:text-5xl font-medium tracking-tight text-[#F6F4EF]"
+              className="mt-2 font-editorial text-3xl md:text-5xl font-medium tracking-tight text-[#141619]"
               style={{ textWrap: 'balance' }}
             >
               按一下，声波荡漾；写两笔，纸上生春。
@@ -488,30 +488,30 @@ export const FeelLabSection: React.FC<FeelLabSectionProps> = ({
           <button
             type="button"
             onClick={toggleMute}
-            className="inline-flex items-center gap-2 self-start md:self-auto border border-white/15 bg-white/[0.04] px-4 py-2 text-xs text-[#E6E4DF] transition-colors hover:border-[#C89B6E] focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#C89B6E]"
+            className="inline-flex items-center gap-2 self-start md:self-auto border border-[#141619]/15 bg-[#FAF8F4]/85 px-4 py-2 text-xs font-medium text-[#141619] transition-colors hover:border-[#9C6226] focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#9C6226]"
             aria-label={muted ? '开启棘轮音效' : '静音棘轮音效'}
           >
             {muted ? (
-              <VolumeX className="h-3.5 w-3.5 text-[#9A9891]" />
+              <VolumeX className="h-3.5 w-3.5 text-[#4C525C]" />
             ) : (
-              <Volume2 className="h-3.5 w-3.5 text-[#E0B382]" />
+              <Volume2 className="h-3.5 w-3.5 text-[#9C6226]" />
             )}
             <span>{muted ? '共鸣音已静音' : '金属共鸣音开启'}</span>
           </button>
         </div>
 
-        {/* Open Gallery Diptych (No rigid dark boxes) */}
+        {/* Open Gallery Diptych */}
         <div className="mt-12 grid grid-cols-1 gap-12 lg:grid-cols-12 lg:items-stretch">
           {/* LEFT: Open 3D Pen Stage over Acoustic Concentric Orbit + Tactile Finishes */}
           <div className="lg:col-span-6 flex flex-col justify-between">
-            <div className="relative h-[390px] sm:h-[440px] w-full overflow-hidden">
+            <div className="relative h-[390px] sm:h-[440px] w-full overflow-hidden border border-[#141619]/10 bg-[#FAF8F4]/68 backdrop-blur-md px-4">
               {/* Subtle concentric acoustic compass rings behind pen */}
               <div
                 className="pointer-events-none absolute inset-0 flex items-center justify-center"
                 aria-hidden="true"
               >
-                <div className="h-[290px] w-[290px] rounded-full border border-white/[0.07]" />
-                <div className="absolute h-[380px] w-[380px] rounded-full border border-dashed border-[#C89B6E]/20" />
+                <div className="h-[290px] w-[290px] rounded-full border border-[#141619]/10" />
+                <div className="absolute h-[380px] w-[380px] rounded-full border border-dashed border-[#9C6226]/30" />
               </div>
 
               <div
@@ -521,29 +521,29 @@ export const FeelLabSection: React.FC<FeelLabSectionProps> = ({
                 aria-label="M-01 材质与按动测试 3D 工作台，点击笔帽触发按动与声波涟漪，拖拽旋转"
               />
 
-              <div className="pointer-events-none absolute top-2 left-0 right-0 z-20 flex items-center justify-between text-xs">
-                <span className="font-mono-tech text-[#B6B3AC]">
+              <div className="pointer-events-none absolute top-3 left-4 right-4 z-20 flex items-center justify-between text-xs">
+                <span className="font-mono-tech text-[#4C525C]">
                   {currentMaterial.englishName}
                 </span>
                 <span
-                  className="font-mono-tech tabular-nums text-[#F6F4EF]"
+                  className="font-mono-tech tabular-nums font-medium text-[#141619]"
                   data-testid="tip-state-label"
                 >
                   {tipExtended ? '笔尖已锁止出芯 (±0.02mm)' : '笔尖已收起'}
                 </span>
               </div>
 
-              <div className="pointer-events-none absolute bottom-2 left-0 z-20 text-[11px] text-[#9A9891]">
+              <div className="pointer-events-none absolute bottom-3 left-4 z-20 text-[11px] text-[#4C525C]">
                 轻触 3D 笔帽可同时激起底座声波涟漪 · 拖拽旋转检视表面光泽
               </div>
             </div>
 
             {/* Borderless Material Palette & Acoustic Click Trigger */}
-            <div className="mt-6 border-t border-white/[0.08] pt-6 flex flex-col gap-6">
+            <div className="mt-6 border-t border-[#141619]/10 pt-6 flex flex-col gap-6">
               <div>
-                <div className="flex items-center justify-between text-xs text-[#B6B3AC] mb-3">
+                <div className="flex items-center justify-between text-xs text-[#4C525C] mb-3">
                   <span>触感表面材质实时切换</span>
-                  <span className="font-mono-tech tabular-nums text-[#E0B382]">
+                  <span className="font-mono-tech tabular-nums font-medium text-[#9C6226]">
                     {currentMaterial.name}
                   </span>
                 </div>
@@ -556,14 +556,14 @@ export const FeelLabSection: React.FC<FeelLabSectionProps> = ({
                         type="button"
                         onClick={() => onSelectMaterial(mat.id)}
                         aria-pressed={active}
-                        className={`flex items-center gap-2.5 border px-3 py-2.5 text-left transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#C89B6E] ${
+                        className={`flex items-center gap-2.5 border px-3 py-2.5 text-left transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#9C6226] ${
                           active
-                            ? 'border-[#C89B6E] bg-[#C89B6E]/15 text-[#F6F4EF]'
-                            : 'border-white/12 bg-white/[0.025] text-[#9A9891] hover:border-white/30 hover:text-[#E6E4DF]'
+                            ? 'border-[#9C6226] bg-[#9C6226]/12 text-[#141619]'
+                            : 'border-[#141619]/12 bg-[#FAF8F4]/78 text-[#4C525C] hover:border-[#141619]/35 hover:text-[#141619]'
                         }`}
                       >
                         <span
-                          className="h-4 w-4 shrink-0 border border-white/25"
+                          className="h-4 w-4 shrink-0 border border-[#141619]/20"
                           style={{
                             background: `linear-gradient(135deg, ${mat.swatchHighlightHex}, ${mat.swatchHex})`,
                           }}
@@ -576,35 +576,35 @@ export const FeelLabSection: React.FC<FeelLabSectionProps> = ({
                     );
                   })}
                 </div>
-                <p className="mt-3 text-xs leading-relaxed text-[#9A9891]">
+                <p className="mt-3 text-xs leading-relaxed text-[#4C525C]">
                   {currentMaterial.finishNote}
                 </p>
               </div>
 
-              <div className="flex flex-wrap items-center justify-between gap-4 border-t border-white/[0.08] pt-5">
+              <div className="flex flex-wrap items-center justify-between gap-4 border-t border-[#141619]/10 pt-5">
                 <div className="flex items-center gap-4">
                   {/* Live mechanical pulse bars reacting on click */}
                   <div className="flex h-6 items-end gap-1" aria-hidden="true">
                     {[0.45, 0.9, 0.65, 1, 0.55].map((scale, idx) => (
                       <span
                         key={`${pulseWaveId}-${idx}`}
-                        className="w-0.5 bg-[#E0B382] transition-all duration-300"
+                        className="w-0.5 bg-[#9C6226] transition-all duration-300"
                         style={{
                           height: `${Math.round(
                             (clickCount > 0 && idx % 2 === pulseWaveId % 2
                               ? scale * 22
                               : scale * 11),
                           )}px`,
-                          opacity: clickCount > 0 ? 0.9 : 0.35,
+                          opacity: clickCount > 0 ? 0.92 : 0.35,
                         }}
                       />
                     ))}
                   </div>
                   <div>
-                    <p className="text-sm font-medium text-[#F6F4EF]">
+                    <p className="text-sm font-medium text-[#141619]">
                       全金属双段棘轮清脆落位
                     </p>
-                    <p className="mt-0.5 font-mono-tech text-xs text-[#9A9891] tabular-nums">
+                    <p className="mt-0.5 font-mono-tech text-xs text-[#4C525C] tabular-nums">
                       累计按动 {clickCount} 次 · 120,000 次无磨损寿命
                     </p>
                   </div>
@@ -614,7 +614,7 @@ export const FeelLabSection: React.FC<FeelLabSectionProps> = ({
                   type="button"
                   onClick={triggerMechanicalClick}
                   data-testid="click-pen-cap-btn"
-                  className="border border-[#C89B6E] bg-[#C89B6E] px-5 py-2.5 text-xs font-medium tracking-wide text-[#0E0F12] transition-transform duration-100 active:scale-[0.97] hover:bg-[#dfba8f] whitespace-nowrap shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#F6F4EF]"
+                  className="border border-[#141619] bg-[#141619] px-5 py-2.5 text-xs font-medium tracking-wide text-[#FAF8F4] transition-colors duration-100 active:scale-[0.97] hover:border-[#9C6226] hover:bg-[#9C6226] whitespace-nowrap shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#9C6226]"
                 >
                   {tipExtended ? '按动收起笔尖' : '按动出芯 · 听声'}
                 </button>
@@ -623,27 +623,27 @@ export const FeelLabSection: React.FC<FeelLabSectionProps> = ({
           </div>
 
           {/* RIGHT: Floating Xuan-Cotton Archival Scroll */}
-          <div className="lg:col-span-6 flex flex-col justify-between border border-white/[0.1] bg-white/[0.025]">
-            <div className="flex flex-wrap items-center justify-between gap-3 border-b border-white/[0.08] px-6 py-4">
+          <div className="lg:col-span-6 flex flex-col justify-between border border-[#141619]/12 bg-[#FAF8F4]/82 backdrop-blur-md">
+            <div className="flex flex-wrap items-center justify-between gap-3 border-b border-[#141619]/10 px-6 py-4">
               <div>
-                <h3 className="text-sm font-medium text-[#F6F4EF]">
+                <h3 className="text-sm font-medium text-[#141619]">
                   0.38mm 双相墨水 · 素纸生春画卷
                 </h3>
-                <p className="mt-0.5 text-xs text-[#9A9891]">
+                <p className="mt-0.5 text-xs text-[#4C525C]">
                   300gsm 无酸棉浆纸纹 · 行笔处随锋芒绽放层瓣繁花
                 </p>
               </div>
 
               <div className="flex items-center gap-2">
-                <div className="flex items-center border border-white/15 bg-black/25 p-0.5 text-xs">
+                <div className="flex items-center border border-[#141619]/15 bg-white/70 p-0.5 text-xs">
                   <button
                     type="button"
                     onClick={() => setWritingMode('poetic')}
                     aria-pressed={writingMode === 'poetic'}
                     className={`px-2.5 py-1 transition-colors whitespace-nowrap shrink-0 ${
                       writingMode === 'poetic'
-                        ? 'bg-[#C89B6E] text-[#0E0F12] font-medium'
-                        : 'text-[#9A9891] hover:text-[#E6E4DF]'
+                        ? 'bg-[#9C6226] text-[#FAF8F4] font-medium'
+                        : 'text-[#4C525C] hover:text-[#141619]'
                     }`}
                   >
                     落笔生花
@@ -654,8 +654,8 @@ export const FeelLabSection: React.FC<FeelLabSectionProps> = ({
                     aria-pressed={writingMode === 'pure'}
                     className={`px-2.5 py-1 transition-colors whitespace-nowrap shrink-0 ${
                       writingMode === 'pure'
-                        ? 'bg-[#E6E4DF] text-[#0E0F12] font-medium'
-                        : 'text-[#9A9891] hover:text-[#E6E4DF]'
+                        ? 'bg-[#141619] text-[#FAF8F4] font-medium'
+                        : 'text-[#4C525C] hover:text-[#141619]'
                     }`}
                   >
                     纯粹墨迹
@@ -665,7 +665,7 @@ export const FeelLabSection: React.FC<FeelLabSectionProps> = ({
                 <button
                   type="button"
                   onClick={clearPaperCanvas}
-                  className="inline-flex items-center gap-1.5 border border-white/15 px-3 py-1.5 text-xs text-[#E6E4DF] transition-colors hover:border-[#C89B6E] hover:text-[#C89B6E] whitespace-nowrap shrink-0 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#C89B6E]"
+                  className="inline-flex items-center gap-1.5 border border-[#141619]/15 bg-white/70 px-3 py-1.5 text-xs text-[#141619] transition-colors hover:border-[#9C6226] hover:text-[#9C6226] whitespace-nowrap shrink-0 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#9C6226]"
                 >
                   <Eraser className="h-3.5 w-3.5" />
                   <span>清除</span>
@@ -676,7 +676,7 @@ export const FeelLabSection: React.FC<FeelLabSectionProps> = ({
                     type="button"
                     onClick={onOpenStudioFullscreen}
                     data-testid="feel-open-studio-btn"
-                    className="inline-flex items-center gap-1.5 border border-[#C89B6E]/60 bg-[#C89B6E]/10 px-3 py-1.5 text-xs text-[#F6F4EF] transition-colors hover:border-[#C89B6E] hover:bg-[#C89B6E] hover:text-[#0E0F12] whitespace-nowrap shrink-0 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#C89B6E]"
+                    className="inline-flex items-center gap-1.5 border border-[#9C6226] bg-[#9C6226]/10 px-3 py-1.5 text-xs font-medium text-[#9C6226] transition-colors hover:bg-[#9C6226] hover:text-[#FAF8F4] whitespace-nowrap shrink-0 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#9C6226]"
                   >
                     <Maximize2 className="h-3.5 w-3.5" />
                     <span>大屏画室</span>
@@ -686,7 +686,7 @@ export const FeelLabSection: React.FC<FeelLabSectionProps> = ({
             </div>
 
             {writingMode === 'poetic' && (
-              <div className="flex flex-wrap items-center justify-between gap-2 border-b border-white/[0.08] bg-black/20 px-6 py-2.5">
+              <div className="flex flex-wrap items-center justify-between gap-2 border-b border-[#141619]/10 bg-white/55 px-6 py-2.5">
                 <div className="flex flex-wrap items-center gap-1.5" role="group" aria-label="落笔生花花卉样式">
                   {FLOWER_STYLE_LIST.map((item) => {
                     const active = item.id === flowerStyle;
@@ -697,10 +697,10 @@ export const FeelLabSection: React.FC<FeelLabSectionProps> = ({
                         data-testid={`flower-style-${item.id}`}
                         aria-pressed={active}
                         onClick={() => setFlowerStyle(item.id)}
-                        className={`inline-flex items-center gap-1.5 border px-2.5 py-1 text-[11px] transition-colors whitespace-nowrap shrink-0 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#C89B6E] ${
+                        className={`inline-flex items-center gap-1.5 border px-2.5 py-1 text-[11px] transition-colors whitespace-nowrap shrink-0 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#9C6226] ${
                           active
-                            ? 'border-[#C89B6E] bg-[#C89B6E]/18 text-[#F6F4EF] font-medium'
-                            : 'border-white/10 bg-white/[0.02] text-[#9A9891] hover:border-white/25 hover:text-[#E6E4DF]'
+                            ? 'border-[#9C6226] bg-[#9C6226]/14 text-[#141619] font-medium'
+                            : 'border-[#141619]/12 bg-white/70 text-[#4C525C] hover:border-[#141619]/30 hover:text-[#141619]'
                         }`}
                       >
                         <span
@@ -713,7 +713,7 @@ export const FeelLabSection: React.FC<FeelLabSectionProps> = ({
                     );
                   })}
                 </div>
-                <span className="text-[11px] text-[#9A9891]">
+                <span className="text-[11px] text-[#4C525C]">
                   {currentFlowerSpec.subtitle}
                 </span>
               </div>
@@ -767,22 +767,22 @@ export const FeelLabSection: React.FC<FeelLabSectionProps> = ({
               </div>
             </div>
 
-            <div className="flex flex-wrap items-center justify-between gap-4 border-t border-white/[0.08] px-6 py-4 text-xs">
+            <div className="flex flex-wrap items-center justify-between gap-4 border-t border-[#141619]/10 px-6 py-4 text-xs">
               <div className="flex items-center gap-6 font-mono-tech tabular-nums">
                 <div>
-                  <span className="text-[#9A9891] mr-2">实时模拟线宽</span>
-                  <span className="text-[#F6F4EF]" data-testid="ink-width-readout">
+                  <span className="text-[#4C525C] mr-2">实时模拟线宽</span>
+                  <span className="font-medium text-[#141619]" data-testid="ink-width-readout">
                     {inkMetrics.lastWidthMm} mm
                   </span>
                 </div>
                 <div>
-                  <span className="text-[#9A9891] mr-2">落笔次数</span>
-                  <span className="text-[#F6F4EF]" data-testid="ink-stroke-count">
+                  <span className="text-[#4C525C] mr-2">落笔次数</span>
+                  <span className="font-medium text-[#141619]" data-testid="ink-stroke-count">
                     {inkMetrics.strokeCount}
                   </span>
                 </div>
               </div>
-              <span className="text-[#9A9891]">
+              <span className="text-[#4C525C]">
                 碳化钨球珠 · 零虚位不刮纸
               </span>
             </div>

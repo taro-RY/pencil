@@ -55,11 +55,11 @@ export function createAbyssalField(): AbyssalFieldHandle {
         float ring1 = smoothstep(0.008, 0.0, abs(r - 0.42));
         float ring2 = smoothstep(0.006, 0.0, abs(r - 0.72));
 
-        vec3 deepWater = vec3(0.11, 0.23, 0.31);
-        vec3 goldGlow = vec3(0.78, 0.61, 0.43);
+        vec3 deepWater = vec3(0.08, 0.44, 0.54);
+        vec3 goldGlow = vec3(0.61, 0.38, 0.15);
 
-        vec3 col = deepWater * caustic * 0.9 + goldGlow * (ring1 * 0.34 + ring2 * 0.2);
-        float alpha = mask * (caustic * 0.36 + ring1 * 0.34 + ring2 * 0.22) * uVisibility;
+        vec3 col = deepWater * caustic * 0.72 + goldGlow * (ring1 * 0.45 + ring2 * 0.28);
+        float alpha = mask * (caustic * 0.28 + ring1 * 0.44 + ring2 * 0.3) * uVisibility;
         gl_FragColor = vec4(col, alpha);
       }
     `,
@@ -127,8 +127,8 @@ export function createAbyssalField(): AbyssalFieldHandle {
         float d = length(gl_PointCoord - vec2(0.5));
         if (d > 0.5) discard;
         float soft = smoothstep(0.5, 0.08, d);
-        vec3 color = vec3(0.82, 0.75, 0.63);
-        gl_FragColor = vec4(color, soft * vAlpha * uVisibility * 0.55);
+        vec3 color = vec3(0.18, 0.34, 0.42);
+        gl_FragColor = vec4(color, soft * vAlpha * uVisibility * 0.42);
       }
     `,
   });
@@ -203,8 +203,8 @@ export function createRipplePedestal(): RipplePedestalHandle {
         float pulse = smoothstep(0.14, 0.0, distFromWave) * exp(-uPulseAge * 1.9);
         float echo = smoothstep(0.09, 0.0, abs(r - max(0.0, waveFront - 0.16))) * exp(-uPulseAge * 2.5) * 0.5;
 
-        vec3 baseCol = vec3(0.28, 0.30, 0.34);
-        vec3 goldCol = vec3(0.82, 0.64, 0.43);
+        vec3 baseCol = vec3(0.22, 0.27, 0.32);
+        vec3 goldCol = vec3(0.61, 0.38, 0.15);
 
         vec3 col = mix(baseCol, goldCol, clamp(pulse + echo, 0.0, 1.0));
         float alpha = edgeMask * (baseRing + (pulse + echo) * 0.72 + 0.05);

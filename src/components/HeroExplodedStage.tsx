@@ -4,9 +4,11 @@ import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { RotateCcw, Sparkles } from 'lucide-react';
 import {
   EXPLODED_PARTS,
+  HERO_PEN_SCALE,
   MaterialId,
   PEN_MATERIALS,
   PartId,
+  computeHeroPenScale,
 } from '../utils/penConfig';
 import { PenAssemblyHandle, buildPenAssembly } from '../three/penGeometry';
 import { createAbyssalField } from '../three/abyssalField';
@@ -140,6 +142,7 @@ export const HeroExplodedStage: React.FC<HeroExplodedStageProps> = ({
     penPivot.add(pen.root);
     penPivot.rotation.set(0.18, -0.35, -0.58);
     penPivot.position.set(0, 0.05, 0);
+    penPivot.scale.setScalar(HERO_PEN_SCALE);
     scene.add(penPivot);
 
     // Abyssal underwater caustic & mineral-mote orbital field (Act II)
@@ -147,14 +150,15 @@ export const HeroExplodedStage: React.FC<HeroExplodedStageProps> = ({
     abyssalField.update(0, 0);
     scene.add(abyssalField.group);
 
-    // 3D Multi-Species Micro-Spring Garden (Act I)
+    // 3D Multi-Species Micro-Spring Garden (Act I background layer behind pen)
     const springGarden = createSpringGarden3D();
     springGardenRef.current = springGarden;
     scene.add(springGarden.group);
+    pen.root.renderOrder = 2;
 
     const raycaster = new THREE.Raycaster();
     const pointerNdc = new THREE.Vector2();
-    const botanicalPlane = new THREE.Plane(new THREE.Vector3(0, 0, 1), 0.95);
+    const botanicalPlane = new THREE.Plane(new THREE.Vector3(0, 0, 1), 1.75);
     const worldHit = new THREE.Vector3();
 
     camera.position.set(0, 0, 10.6);
@@ -298,7 +302,7 @@ export const HeroExplodedStage: React.FC<HeroExplodedStageProps> = ({
             !persistBloomRef.current &&
             now - dwell.lastMoveMs < 4200
           ) {
-            springGarden.awakenAtWorld(dwell.wx, dwell.wy, 1.55, nowSec, dt * 1.25);
+            springGarden.awakenAtWorld(dwell.wx, dwell.wy, 0.46, nowSec, dt * 1.25);
           }
           if (isSoftwareGl) {
             if (persistBloomRef.current) {
@@ -330,9 +334,10 @@ export const HeroExplodedStage: React.FC<HeroExplodedStageProps> = ({
         const baseRotY = THREE.MathUtils.lerp(-0.35, -0.2 + currentOrbitAngle * 0.45, currentBlend);
         const baseRotX = THREE.MathUtils.lerp(0.18, 0.08, currentBlend);
 
-        const heroY = isNarrow ? 0.42 : 0.02;
+        const heroY = isNarrow ? 0.34 : 0.04;
         const explodedY = 0.0;
         penPivot.position.y = THREE.MathUtils.lerp(heroY, explodedY, currentBlend);
+        penPivot.scale.setScalar(computeHeroPenScale(currentBlend));
 
         const parallaxWeight = 1 - currentBlend * 0.75;
         const heroSpinWeight = Math.max(0, 1 - currentBlend * 2);
@@ -502,7 +507,7 @@ export const HeroExplodedStage: React.FC<HeroExplodedStageProps> = ({
             active: true,
             lastMoveMs: nowMs,
           };
-          springGarden.awakenAtWorld(worldHit.x, worldHit.y, 1.55, nowMs / 1000, 0.35);
+          springGarden.awakenAtWorld(worldHit.x, worldHit.y, 0.46, nowMs / 1000, 0.35);
           if (isSoftwareGl) {
             springGarden.step(0.32, nowMs / 1000, persistBloomRef.current);
           }
@@ -607,29 +612,29 @@ export const HeroExplodedStage: React.FC<HeroExplodedStageProps> = ({
       <div id="structure" className="absolute top-[115vh] h-px w-px" aria-hidden="true" />
 
       <div className="sticky top-0 h-screen w-full overflow-hidden">
-        {/* Atmospheric radial vignette shifting smoothly into Deep Abyssal Ink Sea */}
+        {/* Bright atmospheric mist scrim for Act II Exploded View */}
         <div
           className="pointer-events-none absolute inset-0 transition-opacity duration-500"
           style={{
             background:
-              'radial-gradient(ellipse 68% 62% at 50% 48%, rgba(28, 56, 74, 0.36) 0%, rgba(12, 24, 34, 0.42) 60%, rgba(8, 12, 18, 0.48) 100%)',
+              'radial-gradient(ellipse 72% 66% at 50% 48%, rgba(250, 249, 246, 0.64) 0%, rgba(232, 242, 244, 0.72) 60%, rgba(220, 234, 238, 0.80) 100%)',
             opacity: abyssalIntensity,
           }}
           aria-hidden="true"
         />
 
-        {/* Studio spotlight radial wash in Hero */}
+        {/* Gentle luminous bottom mist veil in Hero so dark ink typography stays >= 4.5:1 over any bright sky */}
         <div
           className="pointer-events-none absolute inset-0"
           style={{
             background:
-              'radial-gradient(ellipse 56% 52% at 50% 48%, rgba(240,236,228,0.08) 0%, rgba(208,162,114,0.04) 44%, rgba(14,17,24,0) 78%)',
+              'linear-gradient(to top, rgba(250,248,244,0.68) 0%, rgba(250,248,244,0.22) 26%, rgba(250,248,244,0) 56%)',
             opacity: effectiveHeroFade,
           }}
           aria-hidden="true"
         />
 
-        {/* ACT I: 0.38mm Nib Calligraphy Pointer Ribbon */}
+        {/* ACT I: 0.38mm Ink Calligraphy Pointer Ribbon */}
         <LivingBranchCanvas visibleAlpha={effectiveHeroFade} />
 
         {/* Isolated 3D Canvas Container */}
@@ -644,12 +649,12 @@ export const HeroExplodedStage: React.FC<HeroExplodedStageProps> = ({
 
         {/* Graceful Fallback if WebGL unavailable */}
         {!webglReady && (
-          <div className="absolute inset-0 z-10 flex items-center justify-center bg-[#0E0F12] text-center px-6">
-            <div className="max-w-md border border-white/10 bg-[#14161B] p-8">
-              <p className="font-mono-tech text-xs tracking-widest text-[#C89B6E]">
+          <div className="absolute inset-0 z-10 flex items-center justify-center bg-[#FAF8F4]/90 text-center px-6">
+            <div className="max-w-md border border-[#141619]/15 bg-white p-8">
+              <p className="font-mono-tech text-xs tracking-widest text-[#9C6226]">
                 M-01 · TI-6AL-4V
               </p>
-              <p className="mt-3 text-sm text-[#9A9891]">
+              <p className="mt-3 text-sm text-[#4C525C]">
                 当前浏览器环境未启用 WebGL 3D 渲染，您仍可完整体验下方手感实验室、规格剖面与刻字定制。
               </p>
             </div>
@@ -666,13 +671,13 @@ export const HeroExplodedStage: React.FC<HeroExplodedStageProps> = ({
         >
           {/* Top-left poetic specimen prompt + ephemeral vs persistent bloom toggle */}
           <div className="flex flex-wrap items-center justify-between gap-4">
-            <div className="flex items-center gap-2.5 text-xs tracking-wider text-[#B6B3AC]">
-              <span className="font-mono-tech text-[#F6F4EF]">M-01</span>
+            <div className="flex items-center gap-2.5 border border-[#141619]/10 bg-[#FAF8F4]/72 px-3 py-1.5 backdrop-blur-md text-xs tracking-wider text-[#2E343D]">
+              <span className="font-mono-tech font-medium text-[#141619]">M-01</span>
               <span aria-hidden="true">·</span>
               <span className="hidden sm:inline">划过或停驻固定枯枝，繁花新芽随锋而生</span>
               <span className="sm:hidden">划过枯枝生 3D 春意</span>
               <span aria-hidden="true">·</span>
-              <span className="font-mono-tech tabular-nums text-[#E0B382]">
+              <span className="font-mono-tech tabular-nums font-medium text-[#9C6226]">
                 生境 {Math.round(bloomRatio * 100)}%
               </span>
             </div>
@@ -687,9 +692,9 @@ export const HeroExplodedStage: React.FC<HeroExplodedStageProps> = ({
                   type="button"
                   data-testid="awaken-bloom-btn"
                   onClick={() => setPersistBloom(true)}
-                  className="inline-flex items-center gap-1.5 border border-[#C89B6E]/55 bg-[#121620]/70 px-3 py-1.5 text-xs text-[#F6F4EF] transition-colors hover:border-[#C89B6E] hover:bg-[#C89B6E]/20 whitespace-nowrap shrink-0 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#C89B6E]"
+                  className="inline-flex items-center gap-1.5 border border-[#141619]/15 bg-[#FAF8F4]/80 px-3 py-1.5 text-xs font-medium text-[#141619] backdrop-blur-md transition-colors hover:border-[#9C6226] hover:bg-[#9C6226] hover:text-[#FAF8F4] whitespace-nowrap shrink-0 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#9C6226]"
                 >
-                  <Sparkles className="h-3.5 w-3.5 text-[#E0B382]" />
+                  <Sparkles className="h-3.5 w-3.5 text-[#9C6226]" />
                   <span>驻留满园春色</span>
                 </button>
               ) : (
@@ -699,7 +704,7 @@ export const HeroExplodedStage: React.FC<HeroExplodedStageProps> = ({
                     setPersistBloom(false);
                     setResetCommandId((c) => c + 1);
                   }}
-                  className="inline-flex items-center gap-1.5 border border-white/20 bg-[#121620]/70 px-3 py-1.5 text-xs text-[#E6E4DF] transition-colors hover:border-white/40 whitespace-nowrap shrink-0 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#C89B6E]"
+                  className="inline-flex items-center gap-1.5 border border-[#141619]/20 bg-[#FAF8F4]/85 px-3 py-1.5 text-xs font-medium text-[#141619] backdrop-blur-md transition-colors hover:border-[#9C6226] whitespace-nowrap shrink-0 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#9C6226]"
                 >
                   <RotateCcw className="h-3.5 w-3.5" />
                   <span>恢复随影生灭</span>
@@ -712,12 +717,12 @@ export const HeroExplodedStage: React.FC<HeroExplodedStageProps> = ({
           <div className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
             <div className="max-w-xl">
               <h1
-                className="font-editorial text-[clamp(2.25rem,4.2vw,3.85rem)] font-medium leading-[1.12] tracking-tight text-[#F6F4EF]"
+                className="font-editorial text-[clamp(2.25rem,4.2vw,3.85rem)] font-medium leading-[1.12] tracking-tight text-[#141619]"
                 style={{ textWrap: 'balance' }}
               >
                 克制的重量，落笔的安静。
               </h1>
-              <p className="mt-4 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs md:text-sm text-[#9A9891] font-mono-tech tabular-nums">
+              <p className="mt-4 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs md:text-sm text-[#3A4048] font-mono-tech tabular-nums">
                 <span>0.02mm 零虚位锁止</span>
                 <span aria-hidden="true">·</span>
                 <span>28.4g 黄金配重</span>
@@ -731,24 +736,24 @@ export const HeroExplodedStage: React.FC<HeroExplodedStageProps> = ({
                 effectiveHeroFade < 0.04 ? 'pointer-events-none' : 'pointer-events-auto'
               }`}
             >
-              <div className="font-mono-tech text-2xl md:text-3xl font-medium tracking-tight text-[#F6F4EF] tabular-nums">
+              <div className="font-mono-tech text-2xl md:text-3xl font-medium tracking-tight text-[#141619] tabular-nums">
                 ¥ {activeMaterial.priceCny.toLocaleString('zh-CN')}{' '}
-                <span className="text-sm font-normal text-[#9A9891]">起</span>
+                <span className="text-sm font-normal text-[#4C525C]">起</span>
               </div>
-              <p className="mt-1 text-xs text-[#9A9891]">
+              <p className="mt-1 text-xs text-[#4C525C]">
                 {activeMaterial.name} · Ti-6Al-4V 航空五级钛合金
               </p>
               <a
                 href="#structure"
-                className="mt-4 inline-flex items-center gap-2 border-b border-white/25 pb-1 text-xs tracking-wider text-[#E6E4DF] transition-colors hover:border-[#C89B6E] hover:text-[#C89B6E]"
+                className="mt-4 inline-flex items-center gap-2 border-b border-[#141619]/30 pb-1 text-xs font-medium tracking-wider text-[#141619] transition-colors hover:border-[#9C6226] hover:text-[#9C6226]"
               >
-                向下潜入深空腔体，拆解七件结构 ↓
+                向下步入立体解构，检视七件精密组件 ↓
               </a>
             </div>
           </div>
         </div>
 
-        {/* ACT II: ABYSSAL ORBITAL EXPLODED VIEW OVERLAY */}
+        {/* ACT II: ORBITAL EXPLODED VIEW OVERLAY */}
         <div
           className={`pointer-events-none absolute inset-0 z-20 transition-opacity duration-300 ${
             showExplodedOverlay ? 'opacity-100 visible' : 'opacity-0 invisible'
@@ -783,33 +788,33 @@ export const HeroExplodedStage: React.FC<HeroExplodedStageProps> = ({
                       1,
                     )},${targetY.toFixed(1)} ${targetX.toFixed(1)},${targetY.toFixed(1)}`}
                     fill="none"
-                    stroke={isSelected ? '#C89B6E' : 'rgba(230,228,223,0.24)'}
-                    strokeWidth={isSelected ? 1.25 : 0.75}
+                    stroke={isSelected ? '#9C6226' : 'rgba(20,22,25,0.28)'}
+                    strokeWidth={isSelected ? 1.4 : 0.85}
                   />
                   <circle
                     cx={pt.x}
                     cy={pt.y}
-                    r={isSelected ? 3.5 : 2.2}
-                    fill={isSelected ? '#C89B6E' : '#E6E4DF'}
+                    r={isSelected ? 3.5 : 2.3}
+                    fill={isSelected ? '#9C6226' : '#141619'}
                   />
                 </g>
               );
             })}
           </svg>
 
-          {/* Top Chapter Indicator + Abyssal Orbital Azimuth */}
+          {/* Top Chapter Indicator + Orbital Azimuth */}
           <div className="mx-auto flex max-w-[1280px] items-start justify-between px-6 pt-20 md:px-10">
             <div>
-              <p className="font-mono-tech text-xs tracking-widest text-[#C89B6E]">
-                01. 深潜回旋解构
+              <p className="font-mono-tech text-xs tracking-widest text-[#9C6226]">
+                01. 回旋透视解构
               </p>
-              <h2 className="mt-1 text-lg md:text-2xl font-medium tracking-tight text-[#F6F4EF]">
-                随滚轮潜入水墨深海，七件精密构件逐一悬停
+              <h2 className="mt-1 text-lg md:text-2xl font-medium tracking-tight text-[#141619]">
+                随滚轮展开七件精密构件，自由拖拽检视角度
               </h2>
             </div>
 
             <div className="pointer-events-auto flex items-center gap-3">
-              <span className="hidden sm:inline font-mono-tech text-xs text-[#9A9891] tabular-nums">
+              <span className="hidden sm:inline font-mono-tech text-xs text-[#4C525C] tabular-nums">
                 方位 {String(orbitDegUi).padStart(3, '0')}° · 拆解 {Math.round(explosionUi * 100)}%
               </span>
               <button
@@ -818,7 +823,7 @@ export const HeroExplodedStage: React.FC<HeroExplodedStageProps> = ({
                   setPartAngleBias(0);
                   resetCamFnRef.current?.();
                 }}
-                className="inline-flex items-center gap-1.5 border border-white/15 bg-[#0B1117]/90 px-3 py-1.5 text-xs text-[#E6E4DF] transition-colors hover:border-[#C89B6E] focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#C89B6E]"
+                className="inline-flex items-center gap-1.5 border border-[#141619]/15 bg-[#FAF8F4]/88 px-3 py-1.5 text-xs font-medium text-[#141619] backdrop-blur-md transition-colors hover:border-[#9C6226] hover:text-[#9C6226] focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#9C6226]"
                 aria-label="重置 3D 视角"
               >
                 <RotateCcw className="h-3.5 w-3.5" />
@@ -839,22 +844,22 @@ export const HeroExplodedStage: React.FC<HeroExplodedStageProps> = ({
                     onClick={() => handleSelectPart(part.id)}
                     className={`text-left border-b pb-2.5 transition-colors focus-visible:outline-none ${
                       active
-                        ? 'border-[#C89B6E] text-[#F6F4EF]'
-                        : 'border-white/10 text-[#9A9891] hover:text-[#E6E4DF]'
+                        ? 'border-[#9C6226] text-[#141619]'
+                        : 'border-[#141619]/15 text-[#4C525C] hover:text-[#141619]'
                     }`}
                   >
                     <div className="flex items-baseline justify-between gap-2">
-                      <span className="text-sm font-medium">
-                        <span className="font-mono-tech text-xs text-[#C89B6E] mr-2">
+                      <span className="text-sm font-medium text-[#141619]">
+                        <span className="font-mono-tech text-xs text-[#9C6226] mr-2">
                           {part.index}
                         </span>
                         {part.name}
                       </span>
-                      <span className="font-mono-tech text-[11px] text-[#9A9891] tabular-nums">
+                      <span className="font-mono-tech text-[11px] text-[#4C525C] tabular-nums">
                         {part.metric}
                       </span>
                     </div>
-                    <p className="mt-1 text-xs leading-relaxed text-[#9A9891]">
+                    <p className="mt-1 text-xs leading-relaxed text-[#4C525C]">
                       {part.description}
                     </p>
                   </button>
@@ -872,22 +877,22 @@ export const HeroExplodedStage: React.FC<HeroExplodedStageProps> = ({
                     onClick={() => handleSelectPart(part.id)}
                     className={`text-left border-b pb-2.5 transition-colors focus-visible:outline-none ${
                       active
-                        ? 'border-[#C89B6E] text-[#F6F4EF]'
-                        : 'border-white/10 text-[#9A9891] hover:text-[#E6E4DF]'
+                        ? 'border-[#9C6226] text-[#141619]'
+                        : 'border-[#141619]/15 text-[#4C525C] hover:text-[#141619]'
                     }`}
                   >
                     <div className="flex items-baseline justify-between gap-2">
-                      <span className="text-sm font-medium">
-                        <span className="font-mono-tech text-xs text-[#C89B6E] mr-2">
+                      <span className="text-sm font-medium text-[#141619]">
+                        <span className="font-mono-tech text-xs text-[#9C6226] mr-2">
                           {part.index}
                         </span>
                         {part.name}
                       </span>
-                      <span className="font-mono-tech text-[11px] text-[#9A9891] tabular-nums">
+                      <span className="font-mono-tech text-[11px] text-[#4C525C] tabular-nums">
                         {part.metric}
                       </span>
                     </div>
-                    <p className="mt-1 text-xs leading-relaxed text-[#9A9891]">
+                    <p className="mt-1 text-xs leading-relaxed text-[#4C525C]">
                       {part.description}
                     </p>
                   </button>
@@ -901,28 +906,28 @@ export const HeroExplodedStage: React.FC<HeroExplodedStageProps> = ({
             {(() => {
               const part = EXPLODED_PARTS.find((p) => p.id === selectedPart) ?? EXPLODED_PARTS[0];
               return (
-                <div className="md:hidden border border-white/10 bg-[#0B1117]/95 p-3.5">
+                <div className="md:hidden border border-[#141619]/12 bg-[#FAF8F4]/92 backdrop-blur-md p-3.5">
                   <div className="flex items-center justify-between">
-                    <span className="text-sm font-medium text-[#F6F4EF]">
-                      <span className="font-mono-tech text-xs text-[#C89B6E] mr-2">
+                    <span className="text-sm font-medium text-[#141619]">
+                      <span className="font-mono-tech text-xs text-[#9C6226] mr-2">
                         {part.index}
                       </span>
                       {part.name}
                     </span>
-                    <span className="font-mono-tech text-xs text-[#C89B6E] tabular-nums">
+                    <span className="font-mono-tech text-xs text-[#9C6226] tabular-nums">
                       {part.metric}
                     </span>
                   </div>
-                  <p className="mt-1 text-xs text-[#9A9891]">{part.description}</p>
+                  <p className="mt-1 text-xs text-[#4C525C]">{part.description}</p>
                 </div>
               );
             })()}
 
-            <div className="flex flex-wrap items-center justify-between gap-3 border border-white/10 bg-[#0B1117]/95 px-4 py-2.5">
+            <div className="flex flex-wrap items-center justify-between gap-3 border border-[#141619]/12 bg-[#FAF8F4]/90 backdrop-blur-md px-4 py-2.5">
               <div className="flex items-center gap-3 flex-1 min-w-[200px]">
                 <label
                   htmlFor="explosion-slider"
-                  className="font-mono-tech text-xs text-[#9A9891] whitespace-nowrap shrink-0"
+                  className="font-mono-tech text-xs text-[#4C525C] whitespace-nowrap shrink-0"
                 >
                   拆解刻度
                 </label>
@@ -933,7 +938,7 @@ export const HeroExplodedStage: React.FC<HeroExplodedStageProps> = ({
                   max={100}
                   value={Math.round(explosionUi * 100)}
                   onChange={(e) => setManualOverride(Number(e.target.value) / 100)}
-                  className="h-1 w-full accent-[#C89B6E] cursor-pointer"
+                  className="h-1 w-full accent-[#9C6226] cursor-pointer"
                   aria-label="手动控制笔身爆炸拆解程度"
                 />
                 {manualOverride !== null && (
@@ -943,7 +948,7 @@ export const HeroExplodedStage: React.FC<HeroExplodedStageProps> = ({
                       setManualOverride(null);
                       setPartAngleBias(0);
                     }}
-                    className="font-mono-tech text-[11px] text-[#C89B6E] whitespace-nowrap shrink-0 hover:underline"
+                    className="font-mono-tech text-[11px] text-[#9C6226] whitespace-nowrap shrink-0 hover:underline"
                   >
                     恢复随滚轮同步
                   </button>
@@ -958,8 +963,8 @@ export const HeroExplodedStage: React.FC<HeroExplodedStageProps> = ({
                     onClick={() => handleSelectPart(part.id)}
                     className={`px-2 py-1 font-mono-tech text-xs transition-colors whitespace-nowrap shrink-0 ${
                       selectedPart === part.id
-                        ? 'bg-[#C89B6E] text-[#0E0F12] font-medium'
-                        : 'text-[#9A9891] hover:text-[#E6E4DF]'
+                        ? 'bg-[#141619] text-[#FAF8F4] font-medium'
+                        : 'text-[#4C525C] hover:text-[#141619]'
                     }`}
                   >
                     {part.index}

@@ -82,6 +82,7 @@ export const BotanicalCanvasStudio: React.FC<BotanicalCanvasStudioProps> = ({
   } | null>(null);
 
   const strokeCounterRef = useRef(1);
+  const skipNextInkRebuildRef = useRef(false);
 
   useEffect(() => {
     if (externalFullscreenTrigger > 0) {
@@ -104,14 +105,17 @@ export const BotanicalCanvasStudio: React.FC<BotanicalCanvasStudioProps> = ({
   };
 
   const handleUndo = useCallback(() => {
+    skipNextInkRebuildRef.current = false;
     setHistory((prev) => undoStudioHistory(prev));
   }, []);
 
   const handleRedo = useCallback(() => {
+    skipNextInkRebuildRef.current = false;
     setHistory((prev) => redoStudioHistory(prev));
   }, []);
 
   const handleClear = useCallback(() => {
+    skipNextInkRebuildRef.current = false;
     setHistory((prev) => clearStudioWithUndo(prev));
     setLastWidthMm('0.38');
   }, []);
@@ -167,14 +171,13 @@ export const BotanicalCanvasStudio: React.FC<BotanicalCanvasStudioProps> = ({
 
   const compositePaperAndInk = useCallback(() => {
     const display = displayCanvasRef.current;
-    const stage = stageRef.current;
     const inkCanvas = inkCanvasRef.current;
-    if (!display || !stage || !inkCanvas) return;
+    if (!display || !inkCanvas) return;
 
     const dCtx = display.getContext('2d');
     if (!dCtx) return;
 
-    const rect = stage.getBoundingClientRect();
+    const rect = display.getBoundingClientRect();
     const w = Math.max(1, rect.width);
     const h = Math.max(1, rect.height);
     const preset = getPaperPreset(paperPresetId);
@@ -186,14 +189,13 @@ export const BotanicalCanvasStudio: React.FC<BotanicalCanvasStudioProps> = ({
 
   const rebuildCanvas = useCallback(() => {
     const display = displayCanvasRef.current;
-    const stage = stageRef.current;
-    if (!display || !stage) return;
+    if (!display) return;
 
     if (!inkCanvasRef.current) {
       inkCanvasRef.current = document.createElement('canvas');
     }
     const inkCanvas = inkCanvasRef.current;
-    const rect = stage.getBoundingClientRect();
+    const rect = display.getBoundingClientRect();
     const w = Math.max(1, rect.width);
     const h = Math.max(1, rect.height);
     const dpr = Math.min(window.devicePixelRatio || 1, 2);
@@ -222,19 +224,31 @@ export const BotanicalCanvasStudio: React.FC<BotanicalCanvasStudioProps> = ({
   }, [paperPresetId]);
 
   useEffect(() => {
+    if (skipNextInkRebuildRef.current) {
+      skipNextInkRebuildRef.current = false;
+      return;
+    }
     rebuildCanvas();
-  }, [history, paperPresetId, isFullscreen, rebuildCanvas]);
+  }, [history, rebuildCanvas]);
 
   useEffect(() => {
-    const stage = stageRef.current;
-    if (!stage) return;
+    compositePaperAndInk();
+  }, [paperPresetId, compositePaperAndInk]);
+
+  useEffect(() => {
+    rebuildCanvas();
+  }, [isFullscreen, rebuildCanvas]);
+
+  useEffect(() => {
+    const display = displayCanvasRef.current;
+    if (!display) return;
 
     const onResize = () => rebuildCanvas();
     window.addEventListener('resize', onResize);
 
     const observer =
       typeof ResizeObserver !== 'undefined' ? new ResizeObserver(onResize) : null;
-    observer?.observe(stage);
+    observer?.observe(display);
 
     return () => {
       window.removeEventListener('resize', onResize);
@@ -358,8 +372,11 @@ export const BotanicalCanvasStudio: React.FC<BotanicalCanvasStudioProps> = ({
     if (active.stroke.tool === 'poetic' && active.distSinceSprout >= sproutThreshold) {
       active.distSinceSprout = 0;
       const angle = Math.atan2(dy, dx);
-      const seed = Math.round((x + y) * 100) / 100;
-      active.stroke.sprouts.push({ nx, ny, angle, seed });
+      const afterPointIndex = active.stroke.points.length - 1;
+      const seed =
+        Math.round((active.stroke.id * 41.7 + afterPointIndex * 13.3 + x * 0.37 + y * 0.53) * 100) /
+        100;
+      active.stroke.sprouts.push({ nx, ny, angle, seed, afterPointIndex });
       drawBotanicalSprout(iCtx, active.stroke.flowerStyle, x, y, angle, seed);
     }
 
@@ -383,6 +400,7 @@ export const BotanicalCanvasStudio: React.FC<BotanicalCanvasStudioProps> = ({
     } catch {
       // Ignore if capture already released
     }
+    skipNextInkRebuildRef.current = true;
     setHistory((prev) => commitStudioStroke(prev, active.stroke));
   };
 
@@ -423,8 +441,8 @@ export const BotanicalCanvasStudio: React.FC<BotanicalCanvasStudioProps> = ({
   const strokeCount = history.present.length;
 
   const wrapperClass = isFullscreen
-    ? 'fixed inset-0 z-50 flex flex-col bg-[#0D1017] text-[#E6E4DF]'
-    : 'relative z-10 scroll-mt-16 border-t border-white/[0.08] bg-transparent py-20 md:py-28';
+    ? 'fixed inset-0 z-50 flex flex-col bg-[#F4F1EA] text-[#141619]'
+    : 'relative z-10 scroll-mt-16 border-t border-[#141619]/10 bg-[#FAF8F4]/55 backdrop-blur-sm py-20 md:py-28';
 
   const containerClass = isFullscreen
     ? 'flex flex-1 flex-col min-h-0 px-4 py-3 md:px-8 md:py-4'
@@ -445,16 +463,16 @@ export const BotanicalCanvasStudio: React.FC<BotanicalCanvasStudioProps> = ({
       <div className={containerClass}>
         {/* Header Bar */}
         <div
-          className={`flex flex-wrap items-end justify-between gap-4 ${
-            isFullscreen ? 'pb-3 border-b border-white/[0.08]' : 'pb-7 border-b border-white/[0.08]'
+          className={`flex flex-wrap items-end justify-between gap-4 border-b border-[#141619]/10 ${
+            isFullscreen ? 'pb-3' : 'pb-7'
           }`}
         >
           <div>
-            <p className="font-mono-tech text-xs tracking-widest text-[#E0B382]">
+            <p className="font-mono-tech text-xs tracking-widest text-[#9C6226]">
               02B · 大屏素纸画室
             </p>
             <h2
-              className={`font-editorial font-medium tracking-tight text-[#F6F4EF] ${
+              className={`font-editorial font-medium tracking-tight text-[#141619] ${
                 isFullscreen ? 'mt-0.5 text-xl md:text-2xl' : 'mt-2 text-3xl md:text-5xl'
               }`}
               style={{ textWrap: 'balance' }}
@@ -470,11 +488,11 @@ export const BotanicalCanvasStudio: React.FC<BotanicalCanvasStudioProps> = ({
               disabled={!canUndo}
               data-testid="studio-undo-btn"
               title="撤销 (Ctrl+Z)"
-              className="inline-flex items-center gap-1.5 border border-white/15 bg-white/[0.03] px-3 py-1.5 text-xs text-[#E6E4DF] transition-colors hover:border-[#C89B6E] hover:text-[#E0B382] disabled:opacity-35 disabled:pointer-events-none whitespace-nowrap shrink-0"
+              className="inline-flex items-center gap-1.5 border border-[#141619]/15 bg-white/80 px-3 py-1.5 text-xs text-[#141619] transition-colors hover:border-[#9C6226] hover:text-[#9C6226] disabled:opacity-35 disabled:pointer-events-none whitespace-nowrap shrink-0"
             >
               <Undo2 className="h-3.5 w-3.5" />
               <span>撤销</span>
-              <span className="hidden sm:inline font-mono-tech text-[10px] text-[#9A9891]">Ctrl+Z</span>
+              <span className="hidden sm:inline font-mono-tech text-[10px] text-[#4C525C]">Ctrl+Z</span>
             </button>
 
             <button
@@ -483,7 +501,7 @@ export const BotanicalCanvasStudio: React.FC<BotanicalCanvasStudioProps> = ({
               disabled={!canRedo}
               data-testid="studio-redo-btn"
               title="重做 (Ctrl+Shift+Z)"
-              className="inline-flex items-center gap-1.5 border border-white/15 bg-white/[0.03] px-3 py-1.5 text-xs text-[#E6E4DF] transition-colors hover:border-[#C89B6E] hover:text-[#E0B382] disabled:opacity-35 disabled:pointer-events-none whitespace-nowrap shrink-0"
+              className="inline-flex items-center gap-1.5 border border-[#141619]/15 bg-white/80 px-3 py-1.5 text-xs text-[#141619] transition-colors hover:border-[#9C6226] hover:text-[#9C6226] disabled:opacity-35 disabled:pointer-events-none whitespace-nowrap shrink-0"
             >
               <Redo2 className="h-3.5 w-3.5" />
               <span>重做</span>
@@ -494,7 +512,7 @@ export const BotanicalCanvasStudio: React.FC<BotanicalCanvasStudioProps> = ({
               onClick={handleClear}
               disabled={strokeCount === 0}
               data-testid="studio-clear-btn"
-              className="inline-flex items-center gap-1.5 border border-white/15 bg-white/[0.03] px-3 py-1.5 text-xs text-[#E6E4DF] transition-colors hover:border-[#C89B6E] hover:text-[#E0B382] disabled:opacity-35 disabled:pointer-events-none whitespace-nowrap shrink-0"
+              className="inline-flex items-center gap-1.5 border border-[#141619]/15 bg-white/80 px-3 py-1.5 text-xs text-[#141619] transition-colors hover:border-[#9C6226] hover:text-[#9C6226] disabled:opacity-35 disabled:pointer-events-none whitespace-nowrap shrink-0"
             >
               <Trash2 className="h-3.5 w-3.5" />
               <span>清空</span>
@@ -504,7 +522,7 @@ export const BotanicalCanvasStudio: React.FC<BotanicalCanvasStudioProps> = ({
               type="button"
               onClick={handleExportPng}
               data-testid="studio-export-btn"
-              className="inline-flex items-center gap-1.5 border border-white/15 bg-white/[0.03] px-3 py-1.5 text-xs text-[#E6E4DF] transition-colors hover:border-[#C89B6E] hover:text-[#E0B382] whitespace-nowrap shrink-0"
+              className="inline-flex items-center gap-1.5 border border-[#141619]/15 bg-white/80 px-3 py-1.5 text-xs text-[#141619] transition-colors hover:border-[#9C6226] hover:text-[#9C6226] whitespace-nowrap shrink-0"
             >
               <Download className="h-3.5 w-3.5" />
               <span>导出高清图</span>
@@ -514,7 +532,7 @@ export const BotanicalCanvasStudio: React.FC<BotanicalCanvasStudioProps> = ({
               type="button"
               onClick={() => setIsFullscreen((v) => !v)}
               data-testid="studio-fullscreen-btn"
-              className="inline-flex items-center gap-1.5 border border-[#C89B6E] bg-[#C89B6E]/15 px-3.5 py-1.5 text-xs font-medium text-[#F6F4EF] transition-colors hover:bg-[#C89B6E] hover:text-[#0E0F12] whitespace-nowrap shrink-0"
+              className="inline-flex items-center gap-1.5 border border-[#141619] bg-[#141619] px-3.5 py-1.5 text-xs font-medium text-[#FAF8F4] transition-colors hover:border-[#9C6226] hover:bg-[#9C6226] whitespace-nowrap shrink-0"
             >
               {isFullscreen ? (
                 <>
@@ -533,13 +551,13 @@ export const BotanicalCanvasStudio: React.FC<BotanicalCanvasStudioProps> = ({
 
         {/* Studio Toolbar Strip */}
         <div
-          className={`flex flex-wrap items-center justify-between gap-x-6 gap-y-3 border-b border-white/[0.08] bg-black/25 px-4 py-3 ${
-            isFullscreen ? 'mt-2' : 'mt-6 border-x border-t'
+          className={`flex flex-wrap items-center justify-between gap-x-6 gap-y-3 border-b border-[#141619]/12 bg-[#FAF8F4]/88 backdrop-blur-md px-4 py-3 ${
+            isFullscreen ? 'mt-2 border-x border-t' : 'mt-6 border-x border-t'
           }`}
         >
           {/* Left: Mode + Flower styles */}
           <div className="flex flex-wrap items-center gap-3">
-            <div className="flex items-center border border-white/15 bg-black/35 p-0.5 text-xs">
+            <div className="flex items-center border border-[#141619]/15 bg-white/75 p-0.5 text-xs">
               <button
                 type="button"
                 onClick={() => setTool('poetic')}
@@ -547,8 +565,8 @@ export const BotanicalCanvasStudio: React.FC<BotanicalCanvasStudioProps> = ({
                 aria-pressed={tool === 'poetic'}
                 className={`inline-flex items-center gap-1.5 px-2.5 py-1 transition-colors whitespace-nowrap shrink-0 ${
                   tool === 'poetic'
-                    ? 'bg-[#C89B6E] text-[#0E0F12] font-medium'
-                    : 'text-[#9A9891] hover:text-[#E6E4DF]'
+                    ? 'bg-[#9C6226] text-[#FAF8F4] font-medium'
+                    : 'text-[#4C525C] hover:text-[#141619]'
                 }`}
               >
                 <Sparkles className="h-3 w-3" />
@@ -561,8 +579,8 @@ export const BotanicalCanvasStudio: React.FC<BotanicalCanvasStudioProps> = ({
                 aria-pressed={tool === 'pure'}
                 className={`inline-flex items-center gap-1.5 px-2.5 py-1 transition-colors whitespace-nowrap shrink-0 ${
                   tool === 'pure'
-                    ? 'bg-[#E6E4DF] text-[#0E0F12] font-medium'
-                    : 'text-[#9A9891] hover:text-[#E6E4DF]'
+                    ? 'bg-[#141619] text-[#FAF8F4] font-medium'
+                    : 'text-[#4C525C] hover:text-[#141619]'
                 }`}
               >
                 <PenTool className="h-3 w-3" />
@@ -575,8 +593,8 @@ export const BotanicalCanvasStudio: React.FC<BotanicalCanvasStudioProps> = ({
                 aria-pressed={tool === 'eraser'}
                 className={`inline-flex items-center gap-1.5 px-2.5 py-1 transition-colors whitespace-nowrap shrink-0 ${
                   tool === 'eraser'
-                    ? 'bg-[#F6F4EF] text-[#0E0F12] font-medium'
-                    : 'text-[#9A9891] hover:text-[#E6E4DF]'
+                    ? 'bg-[#141619] text-[#FAF8F4] font-medium'
+                    : 'text-[#4C525C] hover:text-[#141619]'
                 }`}
               >
                 <Eraser className="h-3 w-3" />
@@ -586,7 +604,7 @@ export const BotanicalCanvasStudio: React.FC<BotanicalCanvasStudioProps> = ({
 
             {tool === 'poetic' && (
               <>
-                <div className="h-4 w-px bg-white/15 hidden sm:block" aria-hidden="true" />
+                <div className="h-4 w-px bg-[#141619]/15 hidden sm:block" aria-hidden="true" />
                 <div className="flex flex-wrap items-center gap-1.5" role="group" aria-label="画室花种样式">
                   {FLOWER_STYLE_LIST.map((item) => {
                     const active = item.id === flowerStyle;
@@ -599,8 +617,8 @@ export const BotanicalCanvasStudio: React.FC<BotanicalCanvasStudioProps> = ({
                         onClick={() => setFlowerStyle(item.id)}
                         className={`inline-flex items-center gap-1.5 border px-2.5 py-1 text-[11px] transition-colors whitespace-nowrap shrink-0 ${
                           active
-                            ? 'border-[#C89B6E] bg-[#C89B6E]/18 text-[#F6F4EF] font-medium'
-                            : 'border-white/10 bg-white/[0.02] text-[#9A9891] hover:border-white/25 hover:text-[#E6E4DF]'
+                            ? 'border-[#9C6226] bg-[#9C6226]/14 text-[#141619] font-medium'
+                            : 'border-[#141619]/12 bg-white/75 text-[#4C525C] hover:border-[#141619]/30 hover:text-[#141619]'
                         }`}
                       >
                         <span
@@ -621,7 +639,7 @@ export const BotanicalCanvasStudio: React.FC<BotanicalCanvasStudioProps> = ({
           <div className="flex flex-wrap items-center gap-4">
             {/* Ink Swatches */}
             <div className="flex items-center gap-1.5" role="group" aria-label="墨色选择">
-              <span className="text-[11px] text-[#9A9891] mr-1">墨色</span>
+              <span className="text-[11px] text-[#4C525C] mr-1">墨色</span>
               {INK_COLORS.map((c) => {
                 const active = c.id === inkColorId;
                 return (
@@ -638,8 +656,8 @@ export const BotanicalCanvasStudio: React.FC<BotanicalCanvasStudioProps> = ({
                     aria-pressed={active}
                     className={`h-5 w-5 border transition-transform ${
                       active
-                        ? 'border-[#E0B382] scale-110 ring-1 ring-[#E0B382]/60'
-                        : 'border-white/25 hover:scale-105'
+                        ? 'border-[#9C6226] scale-110 ring-1 ring-[#9C6226]/60'
+                        : 'border-[#141619]/25 hover:scale-105'
                     }`}
                     style={{ backgroundColor: c.hex }}
                   />
@@ -648,7 +666,7 @@ export const BotanicalCanvasStudio: React.FC<BotanicalCanvasStudioProps> = ({
             </div>
 
             {/* Nib Width */}
-            <div className="flex items-center border border-white/12 bg-black/25 text-[11px]">
+            <div className="flex items-center border border-[#141619]/15 bg-white/75 text-[11px]">
               {NIB_SIZES.map((n) => {
                 const active = n.id === nibSizeId;
                 return (
@@ -660,8 +678,8 @@ export const BotanicalCanvasStudio: React.FC<BotanicalCanvasStudioProps> = ({
                     aria-pressed={active}
                     className={`px-2 py-1 transition-colors whitespace-nowrap shrink-0 ${
                       active
-                        ? 'bg-white/15 text-[#F6F4EF] font-medium'
-                        : 'text-[#9A9891] hover:text-[#E6E4DF]'
+                        ? 'bg-[#141619] text-[#FAF8F4] font-medium'
+                        : 'text-[#4C525C] hover:text-[#141619]'
                     }`}
                   >
                     {n.label.split(' ')[0]}
@@ -672,15 +690,15 @@ export const BotanicalCanvasStudio: React.FC<BotanicalCanvasStudioProps> = ({
 
             {/* Bloom Density */}
             {tool === 'poetic' && (
-              <div className="flex items-center border border-white/12 bg-black/25 text-[11px]">
+              <div className="flex items-center border border-[#141619]/15 bg-white/75 text-[11px]">
                 <button
                   type="button"
                   onClick={() => setBloomDensity('sparse')}
                   aria-pressed={bloomDensity === 'sparse'}
                   className={`px-2 py-1 transition-colors whitespace-nowrap shrink-0 ${
                     bloomDensity === 'sparse'
-                      ? 'bg-white/15 text-[#F6F4EF] font-medium'
-                      : 'text-[#9A9891] hover:text-[#E6E4DF]'
+                      ? 'bg-[#141619] text-[#FAF8F4] font-medium'
+                      : 'text-[#4C525C] hover:text-[#141619]'
                   }`}
                 >
                   疏枝
@@ -691,8 +709,8 @@ export const BotanicalCanvasStudio: React.FC<BotanicalCanvasStudioProps> = ({
                   aria-pressed={bloomDensity === 'lush'}
                   className={`px-2 py-1 transition-colors whitespace-nowrap shrink-0 ${
                     bloomDensity === 'lush'
-                      ? 'bg-white/15 text-[#F6F4EF] font-medium'
-                      : 'text-[#9A9891] hover:text-[#E6E4DF]'
+                      ? 'bg-[#141619] text-[#FAF8F4] font-medium'
+                      : 'text-[#4C525C] hover:text-[#141619]'
                   }`}
                 >
                   繁英
@@ -701,7 +719,7 @@ export const BotanicalCanvasStudio: React.FC<BotanicalCanvasStudioProps> = ({
             )}
 
             {/* Paper Surface Presets */}
-            <div className="flex items-center border border-white/12 bg-black/25 text-[11px]" role="group" aria-label="纸面材质">
+            <div className="flex items-center border border-[#141619]/15 bg-white/75 text-[11px]" role="group" aria-label="纸面材质">
               {PAPER_PRESETS.map((p) => {
                 const active = p.id === paperPresetId;
                 return (
@@ -713,8 +731,8 @@ export const BotanicalCanvasStudio: React.FC<BotanicalCanvasStudioProps> = ({
                     aria-pressed={active}
                     className={`px-2.5 py-1 transition-colors whitespace-nowrap shrink-0 ${
                       active
-                        ? 'bg-[#C89B6E]/25 text-[#F6F4EF] font-medium'
-                        : 'text-[#9A9891] hover:text-[#E6E4DF]'
+                        ? 'bg-[#9C6226]/20 text-[#141619] font-medium'
+                        : 'text-[#4C525C] hover:text-[#141619]'
                     }`}
                   >
                     {p.name}
@@ -728,7 +746,7 @@ export const BotanicalCanvasStudio: React.FC<BotanicalCanvasStudioProps> = ({
         {/* Large-Screen Interactive Paper Canvas Stage */}
         <div
           ref={stageRef}
-          className={`relative w-full overflow-hidden border-x border-b border-white/[0.1] ${
+          className={`relative w-full overflow-hidden border-x border-b border-[#141619]/12 ${
             isFullscreen ? 'flex-1 min-h-0' : 'h-[560px] sm:h-[640px] lg:h-[700px]'
           }`}
           style={{ backgroundColor: activePaperSpec.bgHex }}
@@ -769,26 +787,26 @@ export const BotanicalCanvasStudio: React.FC<BotanicalCanvasStudioProps> = ({
         </div>
 
         {/* Telemetry & Shortcut Footer */}
-        <div className="flex flex-wrap items-center justify-between gap-4 border-x border-b border-white/[0.08] bg-black/20 px-4 py-2.5 text-xs">
+        <div className="flex flex-wrap items-center justify-between gap-4 border-x border-b border-[#141619]/12 bg-[#FAF8F4]/88 backdrop-blur-md px-4 py-2.5 text-xs">
           <div className="flex flex-wrap items-center gap-5 font-mono-tech tabular-nums">
             <div>
-              <span className="text-[#9A9891] mr-1.5">已绘笔划</span>
-              <span className="text-[#F6F4EF]" data-testid="studio-stroke-count">
+              <span className="text-[#4C525C] mr-1.5">已绘笔划</span>
+              <span className="font-medium text-[#141619]" data-testid="studio-stroke-count">
                 {strokeCount}
               </span>
             </div>
             <div>
-              <span className="text-[#9A9891] mr-1.5">瞬时锋径</span>
-              <span className="text-[#F6F4EF]">{lastWidthMm} mm</span>
+              <span className="text-[#4C525C] mr-1.5">瞬时锋径</span>
+              <span className="font-medium text-[#141619]">{lastWidthMm} mm</span>
             </div>
             <div>
-              <span className="text-[#9A9891] mr-1.5">当前配置</span>
-              <span className="text-[#E0B382]">
+              <span className="text-[#4C525C] mr-1.5">当前配置</span>
+              <span className="font-medium text-[#9C6226]">
                 {activePaperSpec.name} · {activeInkSpec.name}
               </span>
             </div>
           </div>
-          <span className="font-mono-tech text-[11px] text-[#9A9891]">
+          <span className="font-mono-tech text-[11px] text-[#4C525C]">
             快捷键：Ctrl+Z 撤销 · Ctrl+Shift+Z 重做 · 切换纸张不丢失当前笔迹
           </span>
         </div>

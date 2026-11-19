@@ -79,7 +79,7 @@ export const LivingBranchCanvas: React.FC<LivingBranchCanvasProps> = ({
           const p1 = ribbons[i];
           if (Math.hypot(p1.x - p0.x, p1.y - p0.y) > 95) continue;
           const life = Math.max(0, 1 - p1.age / p1.maxAge);
-          ctx.strokeStyle = `rgba(224, 179, 130, ${(life * 0.42 * alpha).toFixed(3)})`;
+          ctx.strokeStyle = `rgba(148, 88, 34, ${(life * 0.52 * alpha).toFixed(3)})`;
           ctx.lineWidth = p1.width * life;
           ctx.beginPath();
           ctx.moveTo(p0.x, p0.y);

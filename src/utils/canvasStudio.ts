@@ -87,6 +87,7 @@ export interface StudioSproutStamp {
   ny: number;
   angle: number;
   seed: number;
+  afterPointIndex?: number;
 }
 
 export interface StudioStroke {
@@ -237,13 +238,29 @@ export function renderSingleStroke(
   ctx.lineJoin = 'round';
 
   const pts = stroke.points;
-  if (pts.length === 1) {
-    const p = pts[0];
-    const r = (stroke.tool === 'eraser' ? 14 : p.widthPx * 0.65 * stroke.nibScale);
-    ctx.beginPath();
-    ctx.arc(p.nx * w, p.ny * h, Math.max(1, r), 0, Math.PI * 2);
-    ctx.fill();
-  } else {
+
+  // Always draw initial pen touch-down dot so single taps and strokes match pointerdown identically
+  const firstPt = pts[0];
+  const dotR = stroke.tool === 'eraser' ? 12 * stroke.nibScale : 1.15 * stroke.nibScale;
+  ctx.beginPath();
+  ctx.arc(firstPt.nx * w, firstPt.ny * h, Math.max(0.8, dotR), 0, Math.PI * 2);
+  ctx.fill();
+
+  const indexedSprouts = new Map<number, StudioSproutStamp[]>();
+  const trailingSprouts: StudioSproutStamp[] = [];
+  if (stroke.tool === 'poetic') {
+    for (const sp of stroke.sprouts) {
+      if (typeof sp.afterPointIndex === 'number') {
+        const list = indexedSprouts.get(sp.afterPointIndex);
+        if (list) list.push(sp);
+        else indexedSprouts.set(sp.afterPointIndex, [sp]);
+      } else {
+        trailingSprouts.push(sp);
+      }
+    }
+  }
+
+  if (pts.length > 1) {
     let midX = pts[0].nx * w;
     let midY = pts[0].ny * h;
     for (let i = 1; i < pts.length; i++) {
@@ -265,6 +282,17 @@ export function renderSingleStroke(
       ctx.quadraticCurveTo(px, py, nextMidX, nextMidY);
       ctx.stroke();
 
+      const stepSprouts = indexedSprouts.get(i);
+      if (stepSprouts) {
+        ctx.save();
+        ctx.lineCap = 'butt';
+        ctx.lineJoin = 'miter';
+        for (const sp of stepSprouts) {
+          drawBotanicalSprout(ctx, stroke.flowerStyle, sp.nx * w, sp.ny * h, sp.angle, sp.seed);
+        }
+        ctx.restore();
+      }
+
       midX = nextMidX;
       midY = nextMidY;
     }
@@ -272,10 +300,14 @@ export function renderSingleStroke(
 
   ctx.restore();
 
-  if (stroke.tool === 'poetic') {
-    for (const sp of stroke.sprouts) {
+  if (stroke.tool === 'poetic' && trailingSprouts.length > 0) {
+    ctx.save();
+    ctx.lineCap = 'butt';
+    ctx.lineJoin = 'miter';
+    for (const sp of trailingSprouts) {
       drawBotanicalSprout(ctx, stroke.flowerStyle, sp.nx * w, sp.ny * h, sp.angle, sp.seed);
     }
+    ctx.restore();
   }
 }
 

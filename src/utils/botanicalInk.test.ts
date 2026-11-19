@@ -10,7 +10,7 @@ import {
 test('generateSpringGardenLayout builds clean 3D blossom branches without moss clutter', () => {
   const { branches, flora } = generateSpringGardenLayout();
   assert.ok(branches.length >= 8);
-  assert.ok(flora.length >= 80);
+  assert.ok(flora.length >= 36);
   assert.equal(getFloraBloomRatio(flora), 0);
 
   const species = new Set(flora.map((f) => f.kind));

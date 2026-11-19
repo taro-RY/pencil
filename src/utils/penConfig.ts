@@ -231,6 +231,22 @@ export function computeExplodedOffsets(progress: number): Record<PartId, PartOff
 }
 
 /**
+ * Hero Act I scale factor: reduced by 1/3 (to 2/3) so the pen sits gracefully
+ * over the wide 3D botanical canopy without dominating the first screen.
+ */
+export const HERO_PEN_SCALE = 2 / 3;
+
+/**
+ * Smoothly blends the pen scale from HERO_PEN_SCALE (0.667) at Hero Act I (blend = 0)
+ * back to full 1.0 scale in Act II Exploded View (blend = 1) for crisp part inspection.
+ */
+export function computeHeroPenScale(scrollBlend: number): number {
+  const t = Math.max(0, Math.min(1, scrollBlend));
+  const smooth = t * t * (3 - 2 * t);
+  return HERO_PEN_SCALE + (1 - HERO_PEN_SCALE) * smooth;
+}
+
+/**
  * Computes simulated 0.38mm oil-gel neutral ink stroke width (px) from pointer velocity (px/ms).
  * Slower strokes deposit slightly richer ink; faster strokes taper cleanly like a real tungsten tip.
  */
